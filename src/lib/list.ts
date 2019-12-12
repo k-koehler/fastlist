@@ -39,8 +39,9 @@ class FastList<T> {
     const hasCur = !!this.cur && this.cur.index <= idx;
     let cur = hasCur ? this.cur.node : this.head;
     let i = hasCur ? this.cur.index : 0;
-    const iterationLength =
-      i + (hasCur ? this.length - this.cur.index - 1 : this.length);
+    const iterationLength = hasCur
+      ? this.length - this.cur.index - 1
+      : this.length;
     for (; i < i + iterationLength; cur = cur.next, ++i) {
       if (i === idx) {
         this.cur = {
