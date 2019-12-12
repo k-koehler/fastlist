@@ -5,17 +5,24 @@ interface ListNode<T> {
   next: Nullable<ListNode<T>>;
 }
 
+interface Cur<T> {
+  index: number;
+  node: Nullable<ListNode<T>>;
+}
+
 class FastList<T> {
   private head: Nullable<ListNode<T>>;
   private tail: Nullable<ListNode<T>>;
   private isInitialized: boolean;
   private length: number;
+  private cur: Nullable<Cur<T>>;
 
   constructor() {
     this.head = null;
     this.tail = null;
     this.isInitialized = false;
     this.length = 0;
+    this.cur = null;
 
     return new Proxy(this, {
       get: (lst, key) => {
@@ -29,8 +36,17 @@ class FastList<T> {
   }
 
   public at(idx: number): T | null {
-    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
+    const hasCur = !!this.cur && this.cur.index <= idx;
+    let cur = hasCur ? this.cur.node : this.head;
+    let i = hasCur ? this.cur.index : 0;
+    const iterationLength =
+      i + (hasCur ? this.length - this.cur.index - 1 : this.length);
+    for (; i < i + iterationLength; cur = cur.next, ++i) {
       if (i === idx) {
+        this.cur = {
+          node: cur,
+          index: i
+        };
         return cur.value;
       }
     }
