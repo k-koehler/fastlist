@@ -1,28 +1,23 @@
-type Nullable<T> = null | T;
+import Node from './node';
+import { Nullable } from './types';
 
-interface ListNode<T> {
-  value: T;
-  next: Nullable<ListNode<T>>;
-}
-
-interface Cur<T> {
-  index: number;
-  node: Nullable<ListNode<T>>;
-}
-
-class FastList<T> {
-  private head: Nullable<ListNode<T>>;
-  private tail: Nullable<ListNode<T>>;
+class LinkedList<T> {
+  /**
+   * @field the length of the list
+   */
+  public length: number;
+  private head: Nullable<Node<T>>;
+  private tail: Nullable<Node<T>>;
   private isInitialized: boolean;
-  private length: number;
-  private cur: Nullable<Cur<T>>;
 
+  /**
+   * @constructor
+   */
   constructor() {
     this.head = null;
     this.tail = null;
     this.isInitialized = false;
     this.length = 0;
-    this.cur = null;
 
     return new Proxy(this, {
       get: (lst, key) => {
@@ -30,32 +25,32 @@ class FastList<T> {
         if (thisProp !== undefined || typeof key === 'symbol') {
           return thisProp;
         }
-        return lst.at(Number(key));
+        return lst.get(Number(key));
       }
     });
   }
 
-  public at(idx: number): T | null {
-    const hasCur = !!this.cur && this.cur.index <= idx;
-    let cur = hasCur ? this.cur.node : this.head;
-    let i = hasCur ? this.cur.index : 0;
-    const iterationLength = hasCur
-      ? this.length - this.cur.index - 1
-      : this.length;
-    for (; i < i + iterationLength; cur = cur.next, ++i) {
+  /**
+   * random access at a given element
+   * @param the index you wish to retrieve
+   * @returns the element at the given index, null otherwise
+   */
+  public get(idx: number): Nullable<T> {
+    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
       if (i === idx) {
-        this.cur = {
-          node: cur,
-          index: i
-        };
         return cur.value;
       }
     }
     return null;
   }
 
-  public insert(value: T): FastList<T> {
-    const next = { value, next: null };
+  /**
+   * insert an item at the head of the list
+   * @param the value to insert into the list
+   * @returns the modified list
+   */
+  public insert(value: T): LinkedList<T> {
+    const next = new Node(value, null);
     if (!this.isInitialized) {
       this.head = next;
       this.tail = next;
@@ -78,4 +73,4 @@ class FastList<T> {
   }
 }
 
-export default FastList;
+export default LinkedList;
