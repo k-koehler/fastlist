@@ -105,6 +105,107 @@ test('remove only element', t => {
   t.is(lst.tail, null);
 });
 
+test('remove head', t => {
+  const lst = new LinkedList()
+    .push(0)
+    .push(1)
+    .push(2);
+  t.is(lst.length, 3);
+  lst.remove(0);
+  t.is(lst.length, 2);
+  t.is(lst[0], 1);
+  t.is(lst[1], 2);
+});
+
 test('remove arbitrary element', t => {
-  t.pass();
+  const lst = new LinkedList()
+    .push(0)
+    .push(1)
+    .push(2);
+  t.is(lst.length, 3);
+  lst.remove(1);
+  t.is(lst.length, 2);
+  t.is(lst[0], 0);
+  t.is(lst[1], 2);
+});
+
+test('proxy delete works', t => {
+  const lst = new LinkedList()
+    .push(0)
+    .push(1)
+    .push(2);
+  t.is(lst.length, 3);
+  delete lst[1];
+  t.is(lst.length, 2);
+  t.is(lst[0], 0);
+  t.is(lst[1], 2);
+});
+
+test('converts to array', t => {
+  const lst = new LinkedList();
+  for (let i = 0; i < 10; ++i) {
+    lst.push(i);
+  }
+  t.is(lst.length, 10);
+  const arr = lst.toArray();
+  t.true(Array.isArray(arr));
+  for (let i = 0; i < 10; ++i) {
+    t.is(arr[i], i);
+  }
+});
+
+test('create a stack using ll & pop', t => {
+  class Stack {
+    private lst: LinkedList;
+    constructor() {
+      this.lst = new LinkedList();
+    }
+    public pop() {
+      const val = this.lst.first;
+      delete this.lst[0];
+      return val;
+    }
+    public peek() {
+      return this.lst.first;
+    }
+    public push(value: any) {
+      this.lst.pushHead(value);
+    }
+  }
+  const stack = new Stack();
+  for (let i = 1; i <= 1000; ++i) {
+    stack.push(i);
+  }
+  for (let i = 1000; stack.peek() !== null; --i) {
+    t.is(stack.peek(), i);
+    t.is(stack.pop(), i);
+  }
+});
+
+test('create a queue using ll & dequeue', t => {
+  class Queue {
+    private lst: LinkedList;
+    constructor() {
+      this.lst = new LinkedList();
+    }
+    public dequeue() {
+      const val = this.lst.first;
+      delete this.lst[0];
+      return val;
+    }
+    public peek() {
+      return this.lst.first;
+    }
+    public enqueue(value: any) {
+      this.lst.push(value);
+    }
+  }
+  const queue = new Queue();
+  for (let i = 1; i <= 1000; ++i) {
+    queue.enqueue(i);
+  }
+  for (let i = 1; queue.peek() !== null; ++i) {
+    t.is(queue.peek(), i);
+    t.is(queue.dequeue(), i);
+  }
 });
