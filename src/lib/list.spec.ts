@@ -209,3 +209,20 @@ test('create a queue using ll & dequeue', t => {
     t.is(queue.dequeue(), i);
   }
 });
+
+test('static from', t => {
+  t.deepEqual(LinkedList.from([1, 2, 3, 4, 5]).toArray(), [1, 2, 3, 4, 5]);
+});
+
+test('pushAfter', t => {
+  const lst = LinkedList.from([10, 20, 30, 40, 50]);
+  t.deepEqual(lst.pushAfter(2, 99).toArray(), [10, 20, 30, 99, 40, 50]);
+});
+
+test('moveHead', t => {
+  t.pass();
+});
+
+test('moveAfter', t => {
+  t.pass();
+});

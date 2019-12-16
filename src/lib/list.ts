@@ -9,6 +9,7 @@ class LinkedList<T = any> {
   private head: Nullable<Node<T>>;
   private tail: Nullable<Node<T>>;
   private isInitialized: boolean;
+  private cache: Map<number, Node<T>>;
 
   /**
    * @constructor creates a new list
@@ -18,6 +19,7 @@ class LinkedList<T = any> {
     this.tail = null;
     this.isInitialized = false;
     this.length = 0;
+    this.cache = new Map();
 
     return new Proxy(this, {
       get: (_, key) => {
@@ -43,12 +45,15 @@ class LinkedList<T = any> {
     });
   }
 
+  // public interface
+
   /**
    * push an item after the tail of the list
    * @param the value to insert into the list
    * @returns the modified list
    */
   public push(value: T): LinkedList<T> {
+    this.invalidateCache();
     const next = new Node(value, null);
     if (!this.isInitialized) {
       this.head = next;
@@ -65,8 +70,10 @@ class LinkedList<T = any> {
   /**
    * place an item at the head of the list
    * @param value
+   * @returns the modified list
    */
   public pushHead(value: T): LinkedList<T> {
+    this.invalidateCache();
     const head = new Node(value, this.head);
     if (!this.isInitialized) {
       this.isInitialized = true;
@@ -74,6 +81,27 @@ class LinkedList<T = any> {
     this.head = head;
     ++this.length;
     return this;
+  }
+
+  /**
+   * put a new element aftere the given index
+   * @param idx the index for which to put the element after
+   * @param value the new value
+   * @returns the modified list, null if the index is invalid
+   */
+  public pushAfter(idx: number, value: T): Nullable<LinkedList<T>> {
+    if (!this.isValidIndex(idx)) {
+      return null;
+    }
+    const [, cur, next] = this.find(idx);
+    if (cur) {
+      this.invalidateCache();
+      const newNext = new Node(value, next);
+      cur.next = newNext;
+      ++this.length;
+      return this;
+    }
+    return null;
   }
 
   /**
@@ -85,12 +113,11 @@ class LinkedList<T = any> {
     if (!this.isValidIndex(idx)) {
       return null;
     }
-    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
-      if (i === idx) {
-        return cur.value;
-      }
+    const [, cur] = this.find(idx);
+    if (!cur) {
+      return null;
     }
-    return null;
+    return cur.value;
   }
 
   /**
@@ -112,21 +139,21 @@ class LinkedList<T = any> {
     }
     return this.tail.value;
   }
+
   /**
    * @param idx the index you wish to to set
    * @param value the value for the given index
    */
-  public set(idx: number, value: T) {
+  public set(idx: number, value: T): Nullable<LinkedList<T>> {
     if (!this.isValidIndex(idx)) {
       return null;
     }
-    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
-      if (i === idx) {
-        cur.value = value;
-        return this;
-      }
+    const [, cur] = this.find(idx);
+    if (!cur) {
+      return null;
     }
-    return null;
+    cur.value = value;
+    return this;
   }
 
   /**
@@ -142,20 +169,16 @@ class LinkedList<T = any> {
       return true;
     }
     if (idx === 0) {
+      this.invalidateCache();
       this.head = this.head.next;
       --this.length;
       return true;
     }
-    for (
-      let prev = this.head, cur = this.head.next, i = 1;
-      i < this.length;
-      prev = cur, cur = cur.next, ++i
-    ) {
-      if (i === idx) {
-        prev.next = cur.next;
-        --this.length;
-        return true;
-      }
+    const [prev, cur, next] = this.find(idx);
+    if (prev && cur) {
+      this.invalidateCache();
+      prev.next = next;
+      --this.length;
     }
     return true;
   }
@@ -164,21 +187,11 @@ class LinkedList<T = any> {
    * clears the list
    */
   public clear() {
+    this.invalidateCache();
     this.isInitialized = false;
     this.head = null;
     this.tail = null;
     this.length = 0;
-  }
-
-  /**
-   * convert the list to an array
-   */
-  public toArray(): T[] {
-    const lst = Array(this.length);
-    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
-      lst[i] = cur.value;
-    }
-    return lst;
   }
 
   public *[Symbol.iterator](): Generator<T> {
@@ -186,8 +199,81 @@ class LinkedList<T = any> {
       return;
     }
     for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
+      this.cache.set(i, cur);
       yield cur.value;
     }
+  }
+
+  // Array methods
+
+  /**
+   * convert the list to an array
+   */
+  public toArray(): T[] {
+    const arr = Array(this.length);
+    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
+      this.cache.set(i, cur);
+      arr[i] = cur.value;
+    }
+    return arr;
+  }
+
+  public static from<T>(arr: T[]): LinkedList<T> {
+    const lst = new LinkedList<T>();
+    {
+      let i = 0;
+      const length = arr.length;
+      for (; i < length; ++i) {
+        lst.push(arr[i]);
+      }
+    }
+    return lst;
+  }
+
+  // optimizations
+
+  /**
+   * clears the cache
+   * TODO we could be a bit smarter here
+   */
+  private invalidateCache() {
+    this.cache.clear();
+  }
+
+  /**
+   * the reason this is a "fast list"
+   * tries it's hardest to find elements really quickly
+   * @param idx the index you wish to find
+   */
+  private find(
+    idx: number
+  ): [Nullable<Node<T>>, Nullable<Node<T>>, Nullable<Node<T>>] {
+    if (!this.isInitialized) {
+      return [null, null, null];
+    }
+    if (idx === 0) {
+      return [null, this.head, this.head.next];
+    }
+    let prevCached: Nullable<Node<T>>;
+    if ((prevCached = this.cache.get(idx - 1)) !== undefined) {
+      return [
+        prevCached,
+        prevCached.next,
+        prevCached.next !== null ? prevCached.next.next : null
+      ];
+    }
+    let i = 1,
+      prev = this.head,
+      cur = prev.next;
+    const localLength = this.length;
+    // TODO find closest cache index
+    for (; i < localLength; ++i, prev = cur, cur = cur.next) {
+      this.cache.set(i, cur);
+      if (i === idx) {
+        return [prev, cur, cur.next];
+      }
+    }
+    return [null, null, null];
   }
 
   private isValidIndex(idx: number) {
