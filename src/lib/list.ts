@@ -54,7 +54,7 @@ class LinkedList<T = any> {
    */
   public push(value: T): LinkedList<T> {
     this.invalidateCache();
-    const next = new Node(value, null);
+    const next = new Node(value);
     if (!this.isInitialized) {
       this.head = next;
       this.tail = next;
@@ -198,8 +198,8 @@ class LinkedList<T = any> {
     if (!this.isInitialized) {
       return;
     }
-    for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
-      this.cache.set(i, cur);
+    let cur = this.head;
+    for (; cur.next !== null; cur = cur.next) {
       yield cur.value;
     }
   }
