@@ -3,6 +3,37 @@ import { Nullable } from './types';
 
 class LinkedList<T = any> {
   /**
+   * the first element of the list
+   */
+  public get first(): Nullable<T> {
+    if (!this.isInitialized) {
+      return null;
+    }
+    return this.head.value;
+  }
+
+  /**
+   * the last element of the list
+   */
+  public get last(): Nullable<T> {
+    if (!this.isInitialized) {
+      return null;
+    }
+    return this.tail.value;
+  }
+
+  public static from<T>(arr: readonly T[]): LinkedList<T> {
+    const lst = new LinkedList<T>();
+    {
+      let i = 0;
+      const length = arr.length;
+      for (; i < length; ++i) {
+        lst.push(arr[i]);
+      }
+    }
+    return lst;
+  }
+  /**
    * @field the length of the list
    */
   public length: number;
@@ -121,26 +152,6 @@ class LinkedList<T = any> {
   }
 
   /**
-   * the first element of the list
-   */
-  public get first(): Nullable<T> {
-    if (!this.isInitialized) {
-      return null;
-    }
-    return this.head.value;
-  }
-
-  /**
-   * the last element of the list
-   */
-  public get last(): Nullable<T> {
-    if (!this.isInitialized) {
-      return null;
-    }
-    return this.tail.value;
-  }
-
-  /**
    * @param idx the index you wish to to set
    * @param value the value for the given index
    */
@@ -186,7 +197,7 @@ class LinkedList<T = any> {
   /**
    * clears the list
    */
-  public clear() {
+  public clear(): void {
     this.invalidateCache();
     this.isInitialized = false;
     this.head = null;
@@ -209,25 +220,12 @@ class LinkedList<T = any> {
   /**
    * convert the list to an array
    */
-  public toArray(): T[] {
+  public toArray(): readonly T[] {
     const arr = Array(this.length);
     for (let cur = this.head, i = 0; i < this.length; cur = cur.next, ++i) {
-      this.cache.set(i, cur);
       arr[i] = cur.value;
     }
     return arr;
-  }
-
-  public static from<T>(arr: T[]): LinkedList<T> {
-    const lst = new LinkedList<T>();
-    {
-      let i = 0;
-      const length = arr.length;
-      for (; i < length; ++i) {
-        lst.push(arr[i]);
-      }
-    }
-    return lst;
   }
 
   // optimizations
@@ -236,7 +234,7 @@ class LinkedList<T = any> {
    * clears the cache
    * TODO we could be a bit smarter here
    */
-  private invalidateCache() {
+  private invalidateCache(): void {
     this.cache.clear();
   }
 
@@ -247,7 +245,7 @@ class LinkedList<T = any> {
    */
   private find(
     idx: number
-  ): [Nullable<Node<T>>, Nullable<Node<T>>, Nullable<Node<T>>] {
+  ): readonly [Nullable<Node<T>>, Nullable<Node<T>>, Nullable<Node<T>>] {
     if (!this.isInitialized) {
       return [null, null, null];
     }
@@ -262,11 +260,10 @@ class LinkedList<T = any> {
         prevCached.next !== null ? prevCached.next.next : null
       ];
     }
-    let i = 1,
-      prev = this.head,
-      cur = prev.next;
+    let i = 1;
+    let prev = this.head;
+    let cur = prev.next;
     const localLength = this.length;
-    // TODO find closest cache index
     for (; i < localLength; ++i, prev = cur, cur = cur.next) {
       this.cache.set(i, cur);
       if (i === idx) {
@@ -276,14 +273,13 @@ class LinkedList<T = any> {
     return [null, null, null];
   }
 
-  private isValidIndex(idx: number) {
+  private isValidIndex(idx: number): boolean {
     // not an int or invalid index
     return (idx ^ 0) === idx || idx > -1 || idx < this.length;
   }
 
-  private isOwnProp(key: string | number | Symbol) {
+  private isOwnProp(key: string | number | symbol): boolean {
     // typescript can't validate symbol indexers
-    // @ts-ignore
     return this[key] !== undefined || typeof key === 'symbol';
   }
 }

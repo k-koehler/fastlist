@@ -33,9 +33,6 @@ test('square bracket getters function like an array', t => {
   for (let i = 0; i < 3; ++i) {
     t.is(lst[i], i);
   }
-  for (let i = 0; i < 3; ++i) {
-    t.is(lst.get(i), i);
-  }
 });
 
 test('basic getter works', t => {
@@ -160,14 +157,17 @@ test('create a stack using ll & pop', t => {
     constructor() {
       this.lst = new LinkedList();
     }
+    // tslint:disable-next-line: typedef
     public pop() {
       const val = this.lst.first;
       delete this.lst[0];
       return val;
     }
+    // tslint:disable-next-line: typedef
     public peek() {
       return this.lst.first;
     }
+    // tslint:disable-next-line: typedef
     public push(value: any) {
       this.lst.pushHead(value);
     }
@@ -183,19 +183,23 @@ test('create a stack using ll & pop', t => {
 });
 
 test('create a queue using ll & dequeue', t => {
+  // tslint:disable-next-line: max-classes-per-file
   class Queue {
     private lst: LinkedList;
     constructor() {
       this.lst = new LinkedList();
     }
+    // tslint:disable-next-line: typedef
     public dequeue() {
       const val = this.lst.first;
       delete this.lst[0];
       return val;
     }
+    // tslint:disable-next-line: typedef
     public peek() {
       return this.lst.first;
     }
+    // tslint:disable-next-line: typedef
     public enqueue(value: any) {
       this.lst.push(value);
     }

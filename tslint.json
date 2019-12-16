@@ -7,9 +7,11 @@
     "no-parameter-reassignment": true,
     "typedef": [true, "call-signature"],
     "readonly-array": true,
-    "no-delete": true,
     "no-method-signature": true,
     "no-mixed-interface": true,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "no-conditional-assignment": false,
+    "no-bitwise": false,
+    "ban-comma-operator": false
   }
 }
