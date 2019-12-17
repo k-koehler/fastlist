@@ -31,7 +31,7 @@
     "version": "standard-version",
     "reset": "git clean -dfx && git reset --hard && npm i",
     "clean": "trash build test",
-    "prepare-release": "run-s reset test cov doc:html version doc:publish"
+    "prepare-release": "run-s reset test cov version"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",
@@ -44,7 +44,7 @@
     "doc:json": "Generate API documentation in typedoc JSON format",
     "version": "Bump package.json version, update CHANGELOG.md, tag release",
     "reset": "Delete all untracked files and reset the repo to the last commit",
-    "prepare-release": "One-step: clean, build, test, publish docs, and prep a release"
+    "prepare-release": "One-step: clean, build, test, and prep a release"
   },
   "engines": {
     "node": ">=8.9"
@@ -54,8 +54,6 @@
     "sha.js": "^2.4.11"
   },
   "devDependencies": {
-    "@bitjson/npm-scripts-info": "^1.0.0",
-    "@bitjson/typedoc": "^0.15.0-0",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "ava": "2.2.0",
     "codecov": "^3.5.0",
