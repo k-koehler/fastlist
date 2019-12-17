@@ -1,3 +1,3 @@
 # modern-list
 
-list library with fast operations
+list library with modern operations
