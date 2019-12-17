@@ -1,14 +1,15 @@
 {
-  "name": "fastlist",
-  "version": "1.0.0",
-  "description": "list library with fast operations",
+  "name": "modern-list",
+  "version": "0.0.4",
+  "description": "list library with modern operations",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/k-koehler/fastlist",
+  "repository": "https://github.com/k-koehler/modern-list",
   "license": "MIT",
   "keywords": [],
   "scripts": {
+    "relink": "npm run build && npm link",
     "describe": "npm-scripts-info",
     "build": "run-s clean && run-p build:*",
     "build:main": "tsc -p tsconfig.json",
@@ -24,14 +25,10 @@
     "cov:html": "nyc report --reporter=html",
     "cov:send": "nyc report --reporter=lcov && codecov",
     "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
-    "doc": "run-s doc:html && open-cli build/docs/index.html",
-    "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
-    "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
-    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset": "git clean -dfx && git reset --hard && npm i",
     "clean": "trash build test",
-    "prepare-release": "run-s reset test cov:check doc:html version doc:publish"
+    "prepare-release": "run-s reset test cov version"
   },
   "scripts-info": {
     "info": "Display information about the package scripts",
@@ -44,17 +41,16 @@
     "doc:json": "Generate API documentation in typedoc JSON format",
     "version": "Bump package.json version, update CHANGELOG.md, tag release",
     "reset": "Delete all untracked files and reset the repo to the last commit",
-    "prepare-release": "One-step: clean, build, test, publish docs, and prep a release"
+    "prepare-release": "One-step: clean, build, test, and prep a release"
   },
   "engines": {
     "node": ">=8.9"
   },
   "dependencies": {
+    "array-lru": "^1.1.1",
     "sha.js": "^2.4.11"
   },
   "devDependencies": {
-    "@bitjson/npm-scripts-info": "^1.0.0",
-    "@bitjson/typedoc": "^0.15.0-0",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "ava": "2.2.0",
     "codecov": "^3.5.0",
@@ -69,7 +65,7 @@
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^6.0.1",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.3"
   },
   "ava": {
     "failFast": true,
