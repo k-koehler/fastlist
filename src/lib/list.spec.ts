@@ -214,6 +214,20 @@ test('create a queue using ll & dequeue', t => {
   }
 });
 
+// TODO test this
+test.skip('cache works', t => {
+  const lst = new LinkedList()
+    .push(0)
+    .push(1)
+    .push(2)
+    .push(3);
+  let hitCache: boolean = false;
+  lst.get(3);
+  t.is(hitCache, false);
+  lst.get(3);
+  t.is(hitCache, true);
+});
+
 test('static from', t => {
   t.deepEqual(LinkedList.from([1, 2, 3, 4, 5]).toArray(), [1, 2, 3, 4, 5]);
 });

@@ -1,3 +1,5 @@
+export const SIZE = 100000;
+
 // tslint:disable-next-line: no-console
 console.log('dynamic arr size');
 import './arr-dynamic-size';

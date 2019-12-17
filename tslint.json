@@ -6,7 +6,6 @@
     "no-var-keyword": true,
     "no-parameter-reassignment": true,
     "typedef": [true, "call-signature"],
-    "readonly-array": true,
     "no-method-signature": true,
     "no-mixed-interface": true,
     "object-literal-sort-keys": false,

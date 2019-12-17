@@ -1,5 +1,8 @@
+import alru from 'array-lru';
 import Node from './node';
 import { Nullable } from './types';
+
+const MAX_CACHE_SIZE = 1024;
 
 class LinkedList<T = any> {
   /**
@@ -40,7 +43,7 @@ class LinkedList<T = any> {
   private head: Nullable<Node<T>>;
   private tail: Nullable<Node<T>>;
   private isInitialized: boolean;
-  private cache: Map<number, Node<T>>;
+  private cache: LRUObject<Node<T>>;
 
   /**
    * @constructor creates a new list
@@ -50,7 +53,7 @@ class LinkedList<T = any> {
     this.tail = null;
     this.isInitialized = false;
     this.length = 0;
-    this.cache = new Map();
+    this.cache = alru(MAX_CACHE_SIZE);
 
     return new Proxy(this, {
       get: (_, key) => {
@@ -235,7 +238,7 @@ class LinkedList<T = any> {
    * TODO we could be a bit smarter here
    */
   private invalidateCache(): void {
-    this.cache.clear();
+    this.cache = alru(MAX_CACHE_SIZE);
   }
 
   /**
@@ -253,7 +256,7 @@ class LinkedList<T = any> {
       return [null, this.head, this.head.next];
     }
     let prevCached: Nullable<Node<T>>;
-    if ((prevCached = this.cache.get(idx - 1)) !== undefined) {
+    if ((prevCached = this.cache.get(idx - 1)) !== null) {
       return [
         prevCached,
         prevCached.next,
