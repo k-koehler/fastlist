@@ -1,7 +1,7 @@
-import LinkedList from '../../list';
+import FastList from '../../fast-list';
 import { SIZE } from './run-bench';
 
-const lst = new LinkedList();
+const lst = new FastList();
 for (let i = 0; i < SIZE; ++i) {
   lst.push(i);
 }

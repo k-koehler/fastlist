@@ -4,7 +4,7 @@ import { Nullable } from './types';
 
 const MAX_CACHE_SIZE = 1024;
 
-class LinkedList<T = any> {
+class FastList<T = any> {
   /**
    * the first element of the list
    */
@@ -25,8 +25,8 @@ class LinkedList<T = any> {
     return this.tail.value;
   }
 
-  public static from<T>(arr: readonly T[]): LinkedList<T> {
-    const lst = new LinkedList<T>();
+  public static from<T>(arr: readonly T[]): FastList<T> {
+    const lst = new FastList<T>();
     {
       let i = 0;
       const length = arr.length;
@@ -86,7 +86,7 @@ class LinkedList<T = any> {
    * @param the value to insert into the list
    * @returns the modified list
    */
-  public push(value: T): LinkedList<T> {
+  public push(value: T): FastList<T> {
     this.invalidateCache();
     const next = new Node(value);
     if (!this.isInitialized) {
@@ -106,7 +106,7 @@ class LinkedList<T = any> {
    * @param value
    * @returns the modified list
    */
-  public pushHead(value: T): LinkedList<T> {
+  public pushHead(value: T): FastList<T> {
     this.invalidateCache();
     const head = new Node(value, this.head);
     if (!this.isInitialized) {
@@ -123,7 +123,7 @@ class LinkedList<T = any> {
    * @param value the new value
    * @returns the modified list, null if the index is invalid
    */
-  public pushAfter(idx: number, value: T): Nullable<LinkedList<T>> {
+  public pushAfter(idx: number, value: T): Nullable<FastList<T>> {
     if (!this.isValidIndex(idx)) {
       return null;
     }
@@ -158,7 +158,7 @@ class LinkedList<T = any> {
    * @param idx the index you wish to to set
    * @param value the value for the given index
    */
-  public set(idx: number, value: T): Nullable<LinkedList<T>> {
+  public set(idx: number, value: T): Nullable<FastList<T>> {
     if (!this.isValidIndex(idx)) {
       return null;
     }
@@ -282,9 +282,8 @@ class LinkedList<T = any> {
   }
 
   private isOwnProp(key: string | number | symbol): boolean {
-    // typescript can't validate symbol indexers
     return this[key] !== undefined || typeof key === 'symbol';
   }
 }
 
-export default LinkedList;
+export default FastList;

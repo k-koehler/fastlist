@@ -1,5 +1,5 @@
 interface LRUObject<T> {
-  get(index: number): T;
+  get(index: number): T | null;
   set(index: number, val: T): void;
 }
 

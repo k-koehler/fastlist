@@ -1,1 +1,1 @@
-export { default } from './lib/list';
+export { default } from './lib/fast-list';

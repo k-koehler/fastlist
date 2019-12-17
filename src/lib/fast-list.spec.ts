@@ -1,10 +1,10 @@
 import test from 'ava';
-import LinkedList from './list';
+import FastList from './fast-list';
 
-// LinkedList tests
+// FastList tests
 
 test('doesnt err on empty list', t => {
-  const l = new LinkedList<number>();
+  const l = new FastList<number>();
   for (const _ of l) {
     t.fail();
   }
@@ -12,7 +12,7 @@ test('doesnt err on empty list', t => {
 });
 
 test('inserts at tail & iterates the list in successive order', t => {
-  const lst = new LinkedList<number>();
+  const lst = new FastList<number>();
   lst
     .push(0)
     .push(1)
@@ -26,7 +26,7 @@ test('inserts at tail & iterates the list in successive order', t => {
 });
 
 test('square bracket getters function like an array', t => {
-  const lst = new LinkedList<number>()
+  const lst = new FastList<number>()
     .push(0)
     .push(1)
     .push(2);
@@ -36,7 +36,7 @@ test('square bracket getters function like an array', t => {
 });
 
 test('basic getter works', t => {
-  const lst = new LinkedList<number>()
+  const lst = new FastList<number>()
     .push(0)
     .push(1)
     .push(2);
@@ -46,7 +46,7 @@ test('basic getter works', t => {
 });
 
 test("should return null for an element that doesn't exist", t => {
-  const lst = new LinkedList();
+  const lst = new FastList();
   t.is(null, lst[3.4]);
   t.is(null, lst[0]);
   t.is(null, lst[1]);
@@ -54,14 +54,14 @@ test("should return null for an element that doesn't exist", t => {
 });
 
 test('should set a given index', t => {
-  const lst = new LinkedList<number>().push(10).push(20);
+  const lst = new FastList<number>().push(10).push(20);
   t.is(lst.set(2, 50), null);
   t.is(lst.set(0, 100)[0], 100);
   t.is(lst.set(1, 200)[1], 200);
 });
 
 test('should set with proxy', t => {
-  const lst = new LinkedList().push(0).push(1);
+  const lst = new FastList().push(0).push(1);
   lst[0] += 10;
   lst[1] *= 20;
   t.is(lst[0], 10);
@@ -69,7 +69,7 @@ test('should set with proxy', t => {
 });
 
 test('mutli-assignment', t => {
-  const lst = new LinkedList().push(0).push(1);
+  const lst = new FastList().push(0).push(1);
   lst[0] = lst[1] = 10;
   t.is(lst[0], 10);
   t.is(lst[1], 10);
@@ -78,7 +78,7 @@ test('mutli-assignment', t => {
 });
 
 test('remove head repeatedly', t => {
-  const lst = new LinkedList()
+  const lst = new FastList()
     .push(0)
     .push(1)
     .push(2)
@@ -91,7 +91,7 @@ test('remove head repeatedly', t => {
 });
 
 test('remove only element', t => {
-  const lst = new LinkedList().push(0);
+  const lst = new FastList().push(0);
   lst.remove(0);
   t.is(lst.length, 0);
   // @ts-ignore
@@ -103,7 +103,7 @@ test('remove only element', t => {
 });
 
 test('remove head', t => {
-  const lst = new LinkedList()
+  const lst = new FastList()
     .push(0)
     .push(1)
     .push(2);
@@ -115,7 +115,7 @@ test('remove head', t => {
 });
 
 test('remove arbitrary element', t => {
-  const lst = new LinkedList()
+  const lst = new FastList()
     .push(0)
     .push(1)
     .push(2);
@@ -127,7 +127,7 @@ test('remove arbitrary element', t => {
 });
 
 test('proxy delete works', t => {
-  const lst = new LinkedList()
+  const lst = new FastList()
     .push(0)
     .push(1)
     .push(2);
@@ -139,7 +139,7 @@ test('proxy delete works', t => {
 });
 
 test('converts to array', t => {
-  const lst = new LinkedList();
+  const lst = new FastList();
   for (let i = 0; i < 10; ++i) {
     lst.push(i);
   }
@@ -153,9 +153,9 @@ test('converts to array', t => {
 
 test('create a stack using ll & pop', t => {
   class Stack {
-    private lst: LinkedList;
+    private lst: FastList;
     constructor() {
-      this.lst = new LinkedList();
+      this.lst = new FastList();
     }
     // tslint:disable-next-line: typedef
     public pop() {
@@ -185,9 +185,9 @@ test('create a stack using ll & pop', t => {
 test('create a queue using ll & dequeue', t => {
   // tslint:disable-next-line: max-classes-per-file
   class Queue {
-    private lst: LinkedList;
+    private lst: FastList;
     constructor() {
-      this.lst = new LinkedList();
+      this.lst = new FastList();
     }
     // tslint:disable-next-line: typedef
     public dequeue() {
@@ -214,26 +214,37 @@ test('create a queue using ll & dequeue', t => {
   }
 });
 
-// TODO test this
-test.skip('cache works', t => {
-  const lst = new LinkedList()
+test('cache works', t => {
+  const lst = new FastList()
     .push(0)
     .push(1)
     .push(2)
     .push(3);
   let hitCache: boolean = false;
+  // @ts-ignore
+  const oldGet = lst.cache.get;
+  // @ts-ignore
+  lst.cache.get = (idx: number) => {
+    // @ts-ignore
+    const res = oldGet.call(lst.cache, idx);
+    if (res !== null) {
+      hitCache = true;
+    }
+    return res;
+  };
   lst.get(3);
+  // @ts-ignore
   t.is(hitCache, false);
   lst.get(3);
   t.is(hitCache, true);
 });
 
 test('static from', t => {
-  t.deepEqual(LinkedList.from([1, 2, 3, 4, 5]).toArray(), [1, 2, 3, 4, 5]);
+  t.deepEqual(FastList.from([1, 2, 3, 4, 5]).toArray(), [1, 2, 3, 4, 5]);
 });
 
 test('pushAfter', t => {
-  const lst = LinkedList.from([10, 20, 30, 40, 50]);
+  const lst = FastList.from([10, 20, 30, 40, 50]);
   t.deepEqual(lst.pushAfter(2, 99).toArray(), [10, 20, 30, 99, 40, 50]);
 });
 
