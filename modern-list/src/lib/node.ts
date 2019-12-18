@@ -34,7 +34,7 @@ class Node<T> {
   }
   public value: Nullable<T>;
   public next: Nullable<Node<T>>;
-  constructor(value: Nullable<T>, next: Nullable<Node<T>> = null) {
+  constructor(value: Nullable<T> = null, next: Nullable<Node<T>> = null) {
     this.value = value;
     this.next = next;
   }

@@ -1,4 +1,5 @@
 import alru from 'array-lru';
+import Allocator from 'js-malloc';
 import Node from './node';
 import { Nullable } from './types';
 
@@ -44,6 +45,7 @@ class FastList<T = any> {
   private tail: Nullable<Node<T>>;
   private isInitialized: boolean;
   private cache: LRUObject<Node<T>>;
+  private allocator: Allocator<Node<T>>;
 
   /**
    * @constructor creates a new list
@@ -54,6 +56,7 @@ class FastList<T = any> {
     this.isInitialized = false;
     this.length = 0;
     this.cache = alru(MAX_CACHE_SIZE);
+    this.allocator = new Allocator(() => new Node());
   }
 
   // public interface
@@ -65,7 +68,7 @@ class FastList<T = any> {
    */
   public push(value: T): FastList<T> {
     this.invalidateCache();
-    const next = new Node(value);
+    const next = this.newNode(value, null);
     if (!this.isInitialized) {
       this.head = next;
       this.tail = next;
@@ -85,7 +88,7 @@ class FastList<T = any> {
    */
   public pushHead(value: T): FastList<T> {
     this.invalidateCache();
-    const head = new Node(value, this.head);
+    const head = this.newNode(value, this.head);
     if (!this.isInitialized) {
       this.isInitialized = true;
     }
@@ -107,7 +110,7 @@ class FastList<T = any> {
     const [, cur, next] = this.find(idx);
     if (cur) {
       this.invalidateCache();
-      const newNext = new Node(value, next);
+      const newNext = this.newNode(value, next);
       cur.next = newNext;
       ++this.length;
       return this;
@@ -317,6 +320,13 @@ class FastList<T = any> {
   private isValidIndex(idx: number): boolean {
     // not an int or invalid index
     return (idx ^ 0) === idx && idx > -1 && idx < this.length;
+  }
+
+  private newNode(value: T, next: Nullable<Node<T>>) {
+    const node = this.allocator.new();
+    node.value = value;
+    node.next = next;
+    return node;
   }
 }
 
