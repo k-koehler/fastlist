@@ -1,4 +1,4 @@
-const List = require("modern-list").default;
+const { FastList: List } = require("modern-list");
 // https://www.npmjs.com/package/yallist
 const yallist = require("yallist");
 
