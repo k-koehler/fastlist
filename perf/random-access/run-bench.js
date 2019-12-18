@@ -48,9 +48,9 @@ for (let i = 0; i < iterationSize; ++i) {
 
 const fixedArrayAvg = calculateAverageTime(fixedArray);
 const dynamicArrayAvg = calculateAverageTime(dynamicArray);
-const listAvg = calculateAverageTime(list);
 const list1Avg = calculateAverageTime(list1);
 const list2Avg = calculateAverageTime(list2);
+const listAvg = calculateAverageTime(list);
 
 console.log(`
 Fixed array average time: ${fixedArrayAvg} (${opsPerSec(fixedArrayAvg)} ops/sec)
