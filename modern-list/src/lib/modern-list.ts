@@ -1,6 +1,21 @@
 import FastList from './fast-list';
 
 class ModernList<T> extends FastList {
+  public get fast(): FastList<T> {
+    const lst = new FastList<T>();
+    // @ts-ignore
+    lst.head = this.head;
+    // @ts-ignore
+    lst.tail = this.tail;
+    // @ts-ignore
+    lst.length = this.length;
+    // @ts-ignore
+    lst.isInitialized = this.isInitialized;
+    // @ts-ignore
+    lst.cache = this.cache;
+    return lst;
+  }
+
   public static fromFastList<T>(fastlist: FastList<T>): ModernList<T> {
     const lst = new ModernList<T>();
     // @ts-ignore

@@ -1,6 +1,7 @@
 const List = require("modern-list").default;
 // https://www.npmjs.com/package/yallist
 const yallist = require("yallist");
+// https://www.npmjs.com/package/typescript-collections
 const TsList = require("typescript-collections").LinkedList;
 
 const numIterations = 1000000;
