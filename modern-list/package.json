@@ -1,6 +1,6 @@
 {
   "name": "modern-list",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "list library with modern operations",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
